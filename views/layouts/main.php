@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use dee\adminlte\AdminlteAsset;
+use dee\adminlte\assets\AdminlteAsset;
 
 
 /* @var $this \yii\web\View */
@@ -28,7 +28,7 @@ AdminlteAsset::register($this);
             <aside class="right-side">
                 <section class="content-header">
                     <h1>
-                        <?= '&nbsp;' . Html::encode($this->title) ?>
+                        <?= Html::encode($this->title) ?>
                         <small></small>
                     </h1>
                 </section>
@@ -40,13 +40,6 @@ AdminlteAsset::register($this);
                 <?php echo $this->render('sidebar'); ?>
             </aside>
         </div>
-
-        <!--        <footer class="footer">
-                    <div class="container">
-                        <p class="pull-left">&copy; My Company <?= ''//date('Y')              ?></p>
-                        <p class="pull-right"><?= ''//Yii::powered()              ?></p>
-                    </div>
-                </footer>-->
     </div>
     <?php $this->endBody() ?>
 </body>

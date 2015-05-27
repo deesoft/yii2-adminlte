@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\bootstrap\NavBar;
 
 /* @var $this yii\web\View */
 ?>
@@ -8,6 +9,12 @@ use yii\helpers\Html;
     <!-- Add the class icon to your logo image or logo icon to add the margining -->
     SangkilBiz-3
 </a>
+<?php NavBar::begin([
+    'class'=>'navbar-static-top',
+    'renderInnerContainer'=>false,
+]); ?>
+
+<?php NavBar::end(); ?>
 <!-- Header Navbar: style can be found in header.less -->
 <nav class="navbar navbar-static-top" role="navigation">
     <!-- Sidebar toggle button-->
