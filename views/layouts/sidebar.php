@@ -1,45 +1,32 @@
 <?php
 
-use dee\adminlte\widgets\SideMenu;
-use mdm\admin\components\MenuHelper;
+use yii\web\View;
+use dee\adminlte\widgets\Nav;
 
-/* @var $this yii\web\View */
+//use yii\helpers\Html;
+
+/* @var $this View */
+
+$items = [];
+if(isset($this->params['menuCallback'])){
+    $callback = $this->params['menuCallback'];
+}elseif (class_exists('mdm\admin\components\MenuHelper')) {
+    $callback = ['mdm\admin\components\MenuHelper','getAssignedMenu'];
+}
+if(isset($callback) && is_callable($callback)){
+    $items = call_user_func($callback, Yii::$app->user->id);
+}
 ?>
-<section class="sidebar">
-    <!-- Sidebar user panel -->
-    <div class="user-panel">
-        <div class="pull-left image">
-            <img src="/img/avatar04.png" class="img-circle" alt="User Image" />
-        </div>
-        <div class="pull-left info">
-            <p>Hello, <?php echo (!Yii::$app->user->isGuest) ? Yii::$app->user->identity->username : 'Guest'; ?></p>
-            <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
-        </div>
-    </div>
-    <!-- sidebar menu: : style can be found in sidebar.less -->
-    <?php
-    $menuCallback = function($menu) {
-        $item = [
-            'label' => $menu['name'],
-            'url' => MenuHelper::parseRoute($menu['route']),
-        ];
-        if (!empty($menu['data'])) {
-            $item['icon'] = 'fa ' . $menu['data'];
-        } else {
-            $item['icon'] = 'fa fa-angle-double-right';
-        }
-        if ($menu['children'] != []) {
-            $item['items'] = $menu['children'];
-        }
-        return $item;
-    };
-
-    $items = MenuHelper::getAssignedMenu(Yii::$app->user->id, null, $menuCallback);
-    //$items = [];
-    echo SideMenu::widget([
-        'items' => $items,
-    ]);
-    ?>
-
-</section>
-<!-- /.sidebar -->
+<aside class="main-sidebar">
+    
+    <section class="sidebar">
+        <?php
+        echo Nav::widget([
+            'options' => [
+                'class' => 'sidebar-menu',
+                'items' => $items,
+            ]
+        ]);
+        ?>
+    </section>
+</aside>

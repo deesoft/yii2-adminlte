@@ -1,6 +1,6 @@
 <?php
 
-namespace dee\adminlte\assets;
+namespace dee\adminlte;
 
 /**
  * AdminLteAsset
@@ -10,19 +10,18 @@ namespace dee\adminlte\assets;
  */
 class AdminlteAsset extends \yii\web\AssetBundle
 {
-    public $sourcePath = '@vendor/almasaeed2010/adminlte';
+    public $sourcePath = '@bower/adminlte/dist';
     public $css = [
-        'css/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css',
-        'css/AdminLTE.css'
+        'css/AdminLTE.css',
+        'css/skins/_all-skins.min.css'
     ];
     public $js = [
-        'js/AdminLTE/app.js',
+        'js/app.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapPluginAsset',
-        'dee\adminlte\assets\FontAwesome',
-        'dee\adminlte\assets\Ionicon',
+        'rmrevin\yii\fontawesome\AssetBundle',
     ];
 
 }

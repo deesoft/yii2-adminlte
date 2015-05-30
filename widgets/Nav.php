@@ -2,24 +2,19 @@
 
 namespace dee\adminlte\widgets;
 
-use yii\base\InvalidConfigException;
-use yii\helpers\Html;
-use yii\helpers\ArrayHelper;
 use Yii;
+use yii\helpers\Html;
+use rmrevin\yii\fontawesome\FA;
+use yii\helpers\ArrayHelper;
 
 /**
- * Description of SideMenu
+ * Description of Nav
  *
- * @author Misbahul D Munir (mdmunir) <misbahuldmunir@gmail.com>
+ * @author Misbahul D Munir <misbahuldmunir@gmail.com>
+ * @since 1.0
  */
-class SideMenu extends \yii\base\Widget
+class Nav extends Widget
 {
-    /**
-     * @var array the HTML attributes for the widget container tag.
-     * @see \yii\helpers\Html::renderTagAttributes() for details on how attributes are being rendered.
-     */
-    public $options = [];
-
     /**
      * @var array list of items in the nav widget. Each array element represents a single
      * menu item which can be either a string or an array with the following structure:
@@ -70,15 +65,14 @@ class SideMenu extends \yii\base\Widget
      */
     public $params;
 
+    public $submenuOptions = [];
     /**
      * Initializes the widget.
      */
     public function init()
     {
         parent::init();
-        if (!isset($this->options['id'])) {
-            $this->options['id'] = $this->getId();
-        }
+
         if ($this->route === null && Yii::$app->controller !== null) {
             $this->route = Yii::$app->controller->getRoute();
         }
@@ -86,77 +80,76 @@ class SideMenu extends \yii\base\Widget
             $this->params = Yii::$app->request->getQueryParams();
         }
         Html::addCssClass($this->options, 'sidebar-menu');
-        echo Html::tag('ul', implode("\n", $this->renderItems($this->items)), $this->options);
     }
 
-    public function renderItems($items)
+    public function run()
     {
-        $result = [];
+        $this->registerAsset();
+        echo $this->renderItems($this->items, $this->options);
+    }
+
+    public function renderItems($items, $options = [])
+    {
+        $lines = [];
         foreach ($items as $item) {
             if (isset($item['visible']) && !$item['visible']) {
                 continue;
             }
-            $result[] = $this->renderItem($item);
-        }
-
-        return $result;
-    }
-
-    public function renderItem($item)
-    {
-        if (is_string($item)) {
-            return $item;
-        }
-        if (!isset($item['label'])) {
-            throw new InvalidConfigException("The 'label' option is required.");
-        }
-        $label = $this->encodeLabels ? Html::encode($item['label']) : $item['label'];
-        $options = ArrayHelper::getValue($item, 'options', []);
-        $items = ArrayHelper::getValue($item, 'items');
-        $url = ArrayHelper::getValue($item, 'url', '#');
-        $linkOptions = ArrayHelper::getValue($item, 'linkOptions', []);
-        $icon = ArrayHelper::getValue($item, 'icon');
-        $badge = ArrayHelper::getValue($item, 'badge');
-
-        if (isset($item['active'])) {
-            $active = ArrayHelper::remove($item, 'active', false);
-        } else {
-            $active = $this->isItemActive($item);
-        }
-        $linkContent = '';
-        if ($icon) {
-            $linkContent .= Html::tag('i', '', ['class' => $icon]);
-        }
-
-        if ($items !== null && is_array($items)) {
-            Html::addCssClass($options, 'treeview');
-            if ($this->activateItems) {
-                $items = $this->isChildActive($items, $active);
+            if (is_string($item)) {
+                $lines[] = $item;
+                continue;
             }
-            $items = Html::tag('ul', implode("\n", $this->renderItems($items)), ['class' => 'treeview-menu']);
-
-            $linkContent .= Html::tag('span', $label);
-        } else {
-            $linkContent .= $label;
-        }
-
-        if ($badge !== null) {
-            $badge = (array) $badge;
-            $bagdeCss = 'badge pull-right';
-            if (isset($badge[1])) {
-                $bagdeCss .= ' bg-' . $badge[1];
+            if (!array_key_exists('label', $item)) {
+                throw new InvalidConfigException("The 'label' option is required.");
             }
-            $linkContent .= Html::tag('small', $badge[0], ['class' => $bagdeCss]);
-        }
-        if (!empty($items)) {
-            $linkContent .= Html::tag('i', '', ['class' => 'fa fa-angle-left pull-right']);
+            $encodeLabel = isset($item['encode']) ? $item['encode'] : $this->encodeLabels;
+            $label = $encodeLabel ? Html::encode($item['label']) : $item['label'];
+            $itemOptions = ArrayHelper::getValue($item, 'options', []);
+            $linkOptions = ArrayHelper::getValue($item, 'linkOptions', []);
+            $linkOptions['tabindex'] = '-1';
+            $url = array_key_exists('url', $item) ? $item['url'] : '#';
+            $icon = ArrayHelper::getValue($item, 'icon');
+
+            $active = ArrayHelper::getValue($item, 'active');
+            if ($active === null) {
+                $active = $this->isItemActive($item);
+            }
+
+            if (!empty($item['items'])) {
+                $label = "<span>$label</span>";
+            }
+
+            if ($icon) {
+                $label = FA::icon($icon) . $label;
+            }
+
+            if (empty($item['items'])) {
+                if ($url === null) {
+                    $content = $label;
+                } else {
+                    $content = Html::a($label, $url, $linkOptions);
+                }
+            } else {
+                $submenuOptions = $this->submenuOptions;
+                if (isset($item['submenuOptions'])) {
+                    $submenuOptions = array_merge($submenuOptions, $item['submenuOptions']);
+                }
+                Html::addCssClass($submenuOptions, 'treeview-menu');
+                $label .= FA::icon('angle-left')->pullRight();
+                if ($this->activateItems) {
+                    $item['items'] = $this->isChildActive($item['items'], $active);
+                }
+                $content = Html::a($label, $url === null ? '#' : $url, $linkOptions)
+                    . $this->renderItems($item['items'], $submenuOptions);
+                Html::addCssClass($itemOptions, 'treeview');
+            }
+            if ($active) {
+                Html::addCssClass($itemOptions, 'active');
+            }
+            $lines[] = Html::tag('li', $content, $itemOptions);
         }
 
-        if ($this->activateItems && $active) {
-            Html::addCssClass($options, 'active');
-        }
-
-        return Html::tag('li', Html::a($linkContent, $url, $linkOptions) . $items, $options);
+        return Html::tag('ul', implode("\n", $lines), $options);
     }
 
     /**
@@ -168,7 +161,7 @@ class SideMenu extends \yii\base\Widget
     protected function isChildActive($items, &$active)
     {
         foreach ($items as $i => $child) {
-            if (ArrayHelper::remove($items[$i], 'active', false) || $this->isItemActive($child)) {
+            if (ArrayHelper::getValue($items[$i], 'active', false) || $this->isItemActive($child)) {
                 Html::addCssClass($items[$i]['options'], 'active');
                 if ($this->activateParents) {
                     $active = true;
