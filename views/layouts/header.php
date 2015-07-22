@@ -8,7 +8,7 @@ use yii\helpers\ArrayHelper;
 ?>
 <header class="main-header">
     <a href="<?= Yii::$app->homeUrl; ?>" class="logo">
-        <span class="logo-mini"><?= ArrayHelper::getValue(Yii::$app->params, 'app.name', 'App')?></span>
+        <span class="logo-mini"><?= ArrayHelper::getValue(Yii::$app->params, 'app.name.small', 'App')?></span>
         <span class="logo-lg"><?= Yii::$app->name ?></span>
     </a>
     <nav class="navbar navbar-static-top" role="navigation">

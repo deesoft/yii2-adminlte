@@ -64,6 +64,8 @@ class InfoBox extends Widget
                     }  else {
                         echo Html::tag('span', $text, ['class' => $type]);
                     }
+                }  else {
+                    echo $content;
                 }
             }
         }
