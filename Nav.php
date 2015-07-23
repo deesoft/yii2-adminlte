@@ -226,7 +226,6 @@ class Nav extends Widget
                 'options' => ArrayHelper::getValue($parentItem, 'dropDownOptions', []),
                 'items' => $items,
                 'encodeLabels' => $this->encodeLabels,
-                'clientOptions' => false,
                 'view' => $this->getView(),
         ]);
     }
