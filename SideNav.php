@@ -138,15 +138,15 @@ class SideNav extends Widget
      */
     public function renderItems($items, $options)
     {
-        $_items = [];
+        $lines = [];
         foreach ($items as $item) {
             if (isset($item['visible']) && !$item['visible']) {
                 continue;
             }
-            $_items[] = $this->renderItem($item);
+            $lines[] = $this->renderItem($item);
         }
 
-        return Html::tag('ul', implode("\n", $_items), $options);
+        return Html::tag('ul', implode("\n", $lines), $options);
     }
 
     /**
@@ -160,11 +160,15 @@ class SideNav extends Widget
         if (is_string($item)) {
             return $item;
         }
-        if (!isset($item['label'])) {
+        if (!isset($item['label']) && !isset($item['icon'])) {
             throw new InvalidConfigException("The 'label' option is required.");
         }
         $encodeLabel = isset($item['encode']) ? $item['encode'] : $this->encodeLabels;
-        $label = $encodeLabel ? Html::encode($item['label']) : $item['label'];
+        $label = ArrayHelper::getValue($item, 'label','');
+        if($encodeLabel){
+            $label = Html::encode($label);
+        }
+
         $icon = ArrayHelper::getValue($item, 'icon');
         if ($icon) {
             $label .= ' ' . FA::icon($icon);

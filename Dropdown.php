@@ -4,6 +4,7 @@ namespace dee\adminlte;
 
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
+use rmrevin\yii\fontawesome\FA;
 
 /**
  * Dropdown renders a Bootstrap dropdown menu component.
@@ -46,17 +47,18 @@ class Dropdown extends Widget
      * To insert divider use `<li role="presentation" class="divider"></li>`.
      */
     public $items = [];
+
     /**
      * @var boolean whether the labels for header items should be HTML-encoded.
      */
     public $encodeLabels = false;
+
     /**
      * @var array|null the HTML attributes for sub-menu container tags.
      * If not set - [[options]] value will be used for it.
      * @since 2.0.5
      */
     public $submenuOptions;
-
 
     /**
      * Initializes the widget.
@@ -102,11 +104,19 @@ class Dropdown extends Widget
                 $lines[] = $item;
                 continue;
             }
-            if (!array_key_exists('label', $item)) {
+            if (!isset($item['label']) && !isset($item['icon'])) {
                 throw new InvalidConfigException("The 'label' option is required.");
             }
             $encodeLabel = isset($item['encode']) ? $item['encode'] : $this->encodeLabels;
-            $label = $encodeLabel ? Html::encode($item['label']) : $item['label'];
+            $label = ArrayHelper::getValue($item, 'label', '');
+            if ($encodeLabel) {
+                $label = Html::encode($label);
+            }
+            $icon = ArrayHelper::getValue($item, 'icon');
+            if ($icon) {
+                $label .= ' ' . FA::icon($icon);
+            }
+
             $itemOptions = ArrayHelper::getValue($item, 'options', []);
             $linkOptions = ArrayHelper::getValue($item, 'linkOptions', []);
             $linkOptions['tabindex'] = '-1';
