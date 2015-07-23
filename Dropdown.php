@@ -49,7 +49,7 @@ class Dropdown extends Widget
     /**
      * @var boolean whether the labels for header items should be HTML-encoded.
      */
-    public $encodeLabels = true;
+    public $encodeLabels = false;
     /**
      * @var array|null the HTML attributes for sub-menu container tags.
      * If not set - [[options]] value will be used for it.
