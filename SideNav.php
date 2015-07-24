@@ -130,7 +130,7 @@ class SideNav extends Widget
     public function run()
     {
         AdminlteAsset::register($this->getView());
-        return $this->renderItems($this->items,  $this->options);
+        return $this->renderItems($this->items, $this->options);
     }
 
     /**
@@ -164,21 +164,21 @@ class SideNav extends Widget
             throw new InvalidConfigException("The 'label' option is required.");
         }
         $encodeLabel = isset($item['encode']) ? $item['encode'] : $this->encodeLabels;
-        $label = ArrayHelper::getValue($item, 'label','');
-        if($encodeLabel){
+        $label = ArrayHelper::getValue($item, 'label', '');
+        if ($encodeLabel) {
             $label = Html::encode($label);
         }
 
         $icon = ArrayHelper::getValue($item, 'icon');
         if ($icon) {
-            $label .= ' ' . FA::icon($icon);
+            $label = FA::icon($icon) . ' ' . $label;
         }
         $badge = ArrayHelper::getValue($item, 'badge');
         if (!empty($badge)) {
             if (is_array($badge)) {
                 $badgeText = ArrayHelper::getValue($badge, 'text');
                 $badgeColor = ArrayHelper::getValue($badge, 'color');
-            }else{
+            } else {
                 $badgeText = $badge;
                 $badgeColor = 'green';
             }
