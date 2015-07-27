@@ -23,7 +23,8 @@ use rmrevin\yii\fontawesome\FA;
  *         [
  *             'label' => '',
  *             'icon' => 'envelope-o',
- *             'badge' => ['type'=>'success','value'=>4],
+ *             'badge' => '4',
+ *             'badgeColor' => 'red',
  *             'items' => [
  *                  ['label' => 'You have 4 messages', 'options' => ['class'=>'header']],
  *                  '<li class="divider"></li>',
@@ -175,14 +176,8 @@ class SideNav extends Widget
         }
         $badge = ArrayHelper::getValue($item, 'badge');
         if (!empty($badge)) {
-            if (is_array($badge)) {
-                $badgeText = ArrayHelper::getValue($badge, 'text');
-                $badgeColor = ArrayHelper::getValue($badge, 'color');
-            } else {
-                $badgeText = $badge;
-                $badgeColor = 'green';
-            }
-            $label .= ' ' . Html::tag('small', $badgeText, ['class' => 'badge pull-right bg-' . $badgeColor]);
+            $badgeColor = ArrayHelper::getValue($item, 'badgeColor', 'red');
+            $label .= ' ' . Html::tag('small', $badge, ['class' => 'badge pull-right bg-' . $badgeColor]);
         }
         $options = ArrayHelper::getValue($item, 'options', []);
         $items = ArrayHelper::getValue($item, 'items');

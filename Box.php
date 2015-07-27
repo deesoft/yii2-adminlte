@@ -15,8 +15,9 @@ use rmrevin\yii\fontawesome\FA;
  *     'header'=>'Primary Solid Box',
  *     'solid'=>true,
  *     'variant'=>'primary',
- *     'toolboxs'=>[
- *         ['icon'=>'times','options'=>['data-widget'=>'remove','data-togle'=>'tooltip']],
+ *     'boxTools'=>[
+ *         ['label'=>'Primary', 'text'=>'Label...'],
+ *         ['button'=>'collapse', 'icon'=>'minus', 'tooltip'=>'Collapse'],
  *     ],
  * ]);
  *     echo "Body of box\n";
@@ -29,31 +30,13 @@ use rmrevin\yii\fontawesome\FA;
 class Box extends Widget
 {
     public $header;
-    public $toolboxs = [];
+    public $boxTools = [];
     public $variant;
     public $solid = false;
     public $body;
     public $footer;
     public $overlay;
     public $spinOverlayIcon = true;
-    protected $widgets = [
-        'remove' => [
-            'options' => [
-                'data-widget' => 'remove',
-                'data-toggle' => 'tooltip',
-                'title' => 'Remove',
-            ],
-            'icon' => 'times'
-        ],
-        'collapse' => [
-            'options' => [
-                'data-widget' => 'collapse',
-                'data-toggle' => 'tooltip',
-                'title' => 'Collapse',
-            ],
-            'icon' => 'minus'
-        ],
-    ];
 
     /**
      * @inheritdoc
@@ -64,6 +47,9 @@ class Box extends Widget
         Html::addCssClass($this->options, ['widget' => 'box']);
         if ($this->solid) {
             Html::addCssClass($this->options, 'box-solid');
+            if ($this->variant === null) {
+                Html::addCssClass($this->options, 'box-default');
+            }
         }
         if ($this->variant !== null) {
             Html::addCssClass($this->options, 'box-' . $this->variant);
@@ -71,32 +57,46 @@ class Box extends Widget
 
         echo Html::beginTag('div', $this->options);
         // header
-        echo '<div class="box-header with-border">';
-        echo Html::tag('h3', $this->header, ['class' => 'box-title']);
-
+        if ($this->header || !empty($this->boxTools)) {
+            echo '<div class="box-header with-border">';
+            echo Html::tag('h3', $this->header, ['class' => 'box-title']);
+        }
         // box-tools
-        if (!empty($this->toolboxs)) {
+        if (!empty($this->boxTools)) {
             echo Html::beginTag('div', ['class' => 'box-tools pull-right']);
-            foreach ($this->toolboxs as $toolbox) {
+            foreach ($this->boxTools as $toolbox) {
                 if (is_array($toolbox)) {
-                    $type = ArrayHelper::getValue($toolbox, 'type', 'button');
-                    if (($widget = ArrayHelper::getValue($toolbox, 'widget')) !== null && isset($this->widgets[$widget])) {
-                        $toolbox = ArrayHelper::merge($this->widgets[$widget], $toolbox);
+                    $tag = 'span';
+                    if (($widget = ArrayHelper::getValue($toolbox, 'button')) !== null) {
+                        $tag = 'button';
+                        $toolbox['options']['data-widget'] = $widget;
+                        Html::addCssClass($toolbox['options'], 'btn btn-box-tool');
+                    } elseif (($label = ArrayHelper::getValue($toolbox, 'label')) !== null) {
+                        Html::addCssClass($toolbox['options'], 'label label-' . $label);
+                    } elseif (($badge = ArrayHelper::getValue($toolbox, 'badge')) !== null) {
+                        Html::addCssClass($toolbox['options'], 'badge bg-' . $badge);
                     }
+                    $tag = ArrayHelper::getValue($toolbox, 'tag', $tag);
                     $options = ArrayHelper::getValue($toolbox, 'options', []);
                     $text = ArrayHelper::getValue($toolbox, 'text', '');
                     $icon = ArrayHelper::getValue($toolbox, 'icon');
                     if ($icon !== null) {
-                        $text .= FA::icon($icon);
+                        $text .= ' ' . FA::icon($icon);
                     }
-                    echo Html::tag($type, $text, $options);
+                    if (($tooltip = ArrayHelper::getValue($toolbox, 'tooltip')) !== null) {
+                        $options['data-toggle'] = 'tooltip';
+                        $options['title'] = $tooltip;
+                    }
+                    echo Html::tag($tag, $text, $options);
                 } else {
                     echo $toolbox;
                 }
             }
             echo '</div>';
         }
-        echo '</div>';
+        if ($this->header || !empty($this->boxTools)) {
+            echo '</div>';
+        }
 
         // body
         echo '<div class="box-body">';
