@@ -16,9 +16,10 @@ use rmrevin\yii\fontawesome\FA;
  *     'solid'=>true,
  *     'variant'=>'primary',
  *     'boxTools'=>[
- *         ['label'=>'Primary', 'text'=>'Label...'],
+ *         ['badge'=>'red', 'text'=>'3', 'tooltip'=>'3 new messages'],
  *         ['button'=>'collapse', 'icon'=>'minus', 'tooltip'=>'Collapse'],
  *     ],
+ *     'overlay' => 'refresh', // avaliable spinner, cog, gear, circle-o-notch
  * ]);
  *     echo "Body of box\n";
  * Box::end();
@@ -109,10 +110,10 @@ class Box extends Widget
     public function run()
     {
         AdminlteAsset::register($this->getView());
+        echo '</div>';
         if ($this->footer) {
             echo Html::tag('div', $this->footer, ['class' => 'box-footer']);
         }
-        echo '</div>';
         if ($this->overlay) {
             $icon = FA::icon($this->overlay);
             if ($this->spinOverlayIcon) {
